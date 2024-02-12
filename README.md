@@ -589,3 +589,153 @@ public:
     }
 };
 ```
+### 3. Longest Substring Without Repeating Characters
+Given a string `s`, find the length of the longest 
+`substring`
+ without repeating characters.
+* Input: s = "abcabcbb"
+* Output: 3
+* Explanation: The answer is "abc", with the length of 3.
+```
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        int n = s.size();
+        int maxLength = 0;
+        map<char, int> m;
+        int left = 0;
+        for (int right = 0; right < n; right++) {
+            if (
+                m.count(s[right]) == 0 || // return 0 if there is no key [right]
+                m[s[right]] < left
+            ) {
+                m[s[right]] = right;
+                maxLength = max(maxLength, right - left + 1);
+            } else {
+                left = m[s[right]] + 1;
+                m[s[right]] = right;
+            }
+        }
+        return maxLength;
+    }
+};
+```
+### 34. Find First and Last Position of Element in Sorted Array
+Given an array of integers `nums` sorted in non-decreasing order, find the starting and ending position of a given `target` value.
+If `target` is not found in the array, return `[-1, -1]`.
+You must write an algorithm with `O(log n)` runtime complexity.
+* Input: nums = [5,7,7,8,8,10], target = 8
+* Output: [3,4]
+```
+class Solution {
+public:
+    int lower_bound(vector<int>& nums, int low, int high, int target) {
+        while(low <= high) {
+            int mid = (low + high) >> 1;
+            if (nums[mid] < target) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return low;
+    }
+    vector<int> searchRange(vector<int>& nums, int target) {
+        sort(nums.begin(), nums.end());
+        int n = nums.size();
+        vector<int> ans(2);
+        int low = 0, high = n - 1;
+        int startPosition = lower_bound(nums, low, high, target);
+        int endPosition = lower_bound(nums, low, high, target + 1) - 1;
+        cout << startPosition << " " << endPosition << endl;
+        if (startPosition < nums.size() && nums[startPosition] == target) {
+            ans[0] = startPosition;
+            ans[1] = endPosition;
+        } else {
+            ans[0] = ans[1] = -1;
+        }
+        return ans;
+    }
+};
+```
+### 78. Subsets
+Given an integer array nums of unique elements, return all possible 
+subsets
+ (the power set).
+The solution set must not contain duplicate subsets. Return the solution in any order.
+* Input: nums = [1,2,3]
+* Output: [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+```
+class Solution {
+    int k, n;
+public:
+    void solve(int first, vector<vector<int>>& ans, vector<int>& nums, vector<int>& curr) {
+        if (curr.size() == k) { // k = 1
+            ans.push_back(curr);
+            return;
+        }
+        for (int i = first; i < n; ++i) {
+            curr.push_back(nums[i]); // nums[0], nums[1], nums[2],
+            solve(i + 1, ans, nums, curr); // i = 1, i = 2
+            curr.pop_back();
+        }
+    }
+    vector<vector<int>> subsets(vector<int>& nums) {
+        vector<vector<int>> ans;
+        vector<int> curr = {};
+        n = nums.size();
+        for (k = 0; k < n + 1; ++k) {
+            solve(0, ans, nums, curr);
+        }
+        return ans;
+    }
+};
+```
+### 79. Word Search
+Given an `m x n` grid of characters `board` and a string `word`, return true if word exists in the grid.
+The word can be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring. The same letter cell may not be used more than once.
+```
+class Solution {
+public:
+    vector<vector<bool>> visited;
+    bool search(vector<vector<char>>& board, int x, int y, int idx, string word) {
+        if (idx == word.size()) return true;
+        if (
+            x < 0 || 
+            y < 0 || 
+            x >= board.size() || 
+            y >= board[0].size() 
+        ) {
+            return false;
+        }
+        bool ans = false;
+        if (word[idx] == board[x][y]) {
+            board[x][y] = '*';
+            ans = search(board, x + 1, y, idx + 1, word) or 
+                search(board, x, y + 1, idx + 1, word) or 
+                search(board, x - 1, y, idx + 1, word) or 
+                search(board, x, y - 1, idx + 1, word);
+            board[x][y] = word[idx];
+        }
+        return ans;
+    }
+    bool exist(vector<vector<char>>& board, string word) {
+        int m = board.size();
+        int n = board[0].size();
+        visited = vector<vector<bool>> (m, vector<bool>(n, false));
+        // search the source
+        int x = 0, y = 0;
+        int idx = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (board[i][j] == word[idx] && 
+                    search(board, i, j, idx, word)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+};
+```
+
