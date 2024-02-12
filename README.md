@@ -1,6 +1,28 @@
 # leetcode
 
 ### tips 
+- find the index of element of `vector`
+  ```
+  void getIndex(vector<int> v, int K) 
+  { 
+    auto it = find(v.begin(), v.end(), K); 
+  
+    // If element was found 
+    if (it != v.end())  
+    { 
+      
+        // calculating the index 
+        // of K 
+        int index = it - v.begin(); 
+        cout << index << endl; 
+    } 
+    else { 
+        // If the element is not 
+        // present in the vector 
+        cout << "-1" << endl; 
+    } 
+  } 
+  ```
 - copy all elements from maps `mp` to vector `vc`
   ```
   map<int, int> mp;
@@ -101,6 +123,108 @@
   int ans = dp[0];
   for (int i = 1; i < nums.size(); i++) {
       ans = max(ans, dp[i]);
+  }
+  ```
+- Longest Common Subsequences :
+  ```
+  int longestCommonSubsequence(string s1, string s2) {
+        int m = s1.size(), n = s2.size();
+        vector<vector<int>> dp(m + 1, vector<int>(n + 1));
+        for(int i = 0; i <= m; i++) {
+            for(int j = 0; j <= n; j++) {
+                if(i == 0 || j == 0) dp[i][j] = 0; // one or more of the lengths is 0
+                else if(s1[i-1] == s2[j-1]) dp[i][j] = 1 + dp[i-1][j-1]; // found a common character
+                else dp[i][j] = max(dp[i-1][j], dp[i][j-1]); // take the best of both scenarios
+            }
+        }
+        return dp[m][n];
+  }
+  ```
+- Longest Palindromic S: 
+  ```
+  int lps(string& s1, string& s2, int n1, int n2)
+  {
+      if (n1 == 0 || n2 == 0) {
+          return 0;
+      }
+      if (dp[n1][n2] != -1) {
+          return dp[n1][n2];
+      }
+      if (s1[n1 - 1] == s2[n2 - 1]) {
+          return dp[n1][n2] = 1 + lps(s1, s2, n1 - 1, n2 - 1);
+      }
+      else {
+          return dp[n1][n2] = max(lps(s1, s2, n1 - 1, n2),
+                                  lps(s1, s2, n1, n2 - 1));
+      }
+  }
+  ```
+- edit distance : return the minimum edit of string `str1` to string `str2`: 
+  ```
+  if (str1[i – 1] == str2[j – 1]) dp[i][j] = dp[i – 1][j – 1];
+  if (str1[i – 1] != str2[j – 1]) dp[i][j] = 1 + min(dp[i][j – 1], dp[i – 1][j], dp[i – 1][j – 1]);
+  ```
+  let see how to implement this :
+  ```
+  int editDistDP(string str1, string str2, int m, int n)
+  {
+    // Create a table to store results of subproblems
+    int dp[m + 1][n + 1];
+ 
+    // Fill d[][] in bottom up manner
+    for (int i = 0; i <= m; i++) {
+        for (int j = 0; j <= n; j++) {
+            // If first string is empty, only option is to
+            // insert all characters of second string
+            if (i == 0)
+                dp[i][j] = j; // Min. operations = j
+ 
+            // If second string is empty, only option is to
+            // remove all characters of second string
+            else if (j == 0)
+                dp[i][j] = i; // Min. operations = i
+ 
+            // If last characters are same, ignore last char
+            // and recur for remaining string
+            else if (str1[i - 1] == str2[j - 1])
+                dp[i][j] = dp[i - 1][j - 1];
+ 
+            // If the last character is different, consider
+            // all possibilities and find the minimum
+            else
+                dp[i][j]
+                    = 1
+                      + min(dp[i][j - 1], // Insert
+                            dp[i - 1][j], // Remove
+                            dp[i - 1][j - 1]); // Replace
+        }
+    }
+ 
+    return dp[m][n];
+  }
+  ```
+- knapsack:
+  ```
+  int knapsack(int W, int wt[], int val[], int n)
+  {
+     int i, w;
+     int K[n+1][W+1];
+   
+     // Build table K[][] in bottom up manner
+     for (i = 0; i <= n; i++)
+     {
+         for (w = 0; w <= W; w++)
+         {
+             if (i==0 || w==0)
+                 K[i][w] = 0;
+             else if (wt[i-1] <= w)
+                   K[i][w] = max(val[i-1] + K[i-1][w-wt[i-1]],  K[i-1][w]);
+             else
+                   K[i][w] = K[i-1][w];
+         }
+     }
+   
+     return K[n][W];
   }
   ```
 - flood fill :
@@ -309,6 +433,59 @@ public:
             if (--k == 0) break;
         }
         return ans;
+    }
+};
+```
+### 56. Merge Intervals
+Given an array of `intervals` where `intervals[i] = [starti, endi]`, merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the `intervals` in the input.
+* Input: intervals = [[1,3],[2,6],[8,10],[15,18]]
+* Output: [[1,6],[8,10],[15,18]]
+* Explanation: Since intervals [1,3] and [2,6] overlap, merge them into [1,6].
+```
+class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        sort(intervals.begin(), intervals.end());
+
+        vector<vector<int>> merged;
+        for (auto interval : intervals) {
+            // if the list of merged intervals is empty or if the current
+            // interval does not overlap with the previous, simply append it.
+            if (merged.empty() || merged.back()[1] < interval[0]) {
+                merged.push_back(interval);
+            }
+            // otherwise, there is overlap, so we merge the current and previous
+            // intervals.
+            else {
+                merged.back()[1] = max(merged.back()[1], interval[1]);
+            }
+        }
+        return merged;
+    }
+};
+```
+or 
+```
+class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        int size = intervals.size();
+        if (size <= 1) return intervals;
+        sort(intervals.begin(), intervals.end());
+        int start = intervals[0][0];
+        int end = intervals[0][1];
+        vector<vector<int>> res;
+        for (int i = 1; i < size; i++) {
+            if (intervals[i][0] > end) {
+                res.push_back({start, end});
+                start = intervals[i][0];
+                end = intervals[i][1];
+            } else if (intervals[i][1] > end){
+                end = intervals[i][1];
+            }
+            if (i == size - 1) res.push_back({start, end});
+        }
+        return res;
     }
 };
 ```
