@@ -43,6 +43,27 @@
         return s == t;
   }
   ```
+- isPalindrome : checkk if two string or vector are palindromic or not ?
+  ```
+  bool isPalindrome(string x) {
+        string t = x;
+        reverse(t.begin(), t.end());
+        return x == t;
+  }
+  ```
+  or
+  ```
+  bool isPalindrome(string &s, int start, int end) {
+        while (start < end) {
+            if (s[start] != s[end]) {
+                return false;
+            }
+            start++;
+            end--;
+        }
+        return true;
+  }
+  ```
 - hammingWeight : get the total of '1' bits in `binary`
   ```
     int hammingWeight(uint32_t n) {
@@ -320,6 +341,46 @@ public:
             sortedString += c;
         }
         return sortedString;
+    }
+};
+```
+### 131. Palindrome Partitioning
+Given a string `s`, partition `s` such that every 
+substring
+ of the partition is a 
+palindrome
+. Return all possible palindrome partitioning of `s`.
+* Input: s = "aab"
+* Output: [["a","a","b"],["aa","b"]]
+```
+class Solution {
+public:
+    vector<vector<string>> partition(string s) {
+        vector<vector<string>> ans;
+        vector<string> v = {};
+        fnc(s, v, ans);
+        return ans;
+    }
+    void fnc(string s, vector<string>& v, vector<vector<string>>& ans) {
+        if (s.size() == 0) {
+            ans.push_back(v);
+            return;
+        }
+
+        for (int len = 1; len <= s.size(); len++) {
+            string x = s.substr(0, len);
+            if (isPalindrome(x)) {
+                v.push_back(x);
+                string y = s.substr(len, s.size() - len);
+                fnc(y, v, ans);
+                v.pop_back();
+            }
+        }
+    }
+    bool isPalindrome(string x) {
+        string t = x;
+        reverse(t.begin(), t.end());
+        return x == t;
     }
 };
 ```
