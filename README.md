@@ -1,6 +1,21 @@
 # leetcode
 
 ### tips 
+- print each value of `vector<vector<int>>`
+  ```
+  std::vector<std::vector<int>> matrix = {
+        {1, 2, 3},
+        {4, 5, 6},
+        {7, 8, 9}
+    };
+    for (const auto& row : matrix) {
+        for (int element : row) {
+            std::cout << element << " ";
+        }
+        std::cout << std::endl;
+    }
+  ```
+- 
 - find the index of element of `vector`
   ```
   void getIndex(vector<int> v, int K) 
@@ -735,6 +750,55 @@ public:
             }
         }
         return false;
+    }
+};
+```
+### 22. Generate Parentheses
+Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses
+* Input: n = 3
+* Output: ["((()))","(()())","(())()","()(())","()()()"]
+```
+class Solution {
+public:
+    void solve(vector<string>& ans, int i, int j, int n, string s) {
+        if (i == j and i == n) {
+            ans.push_back(s);
+            return;
+        }
+        if (i < n) solve(ans, i + 1, j, n, s + '(');
+        if (j < i) solve(ans, i, j + 1, n, s + ')');
+    }
+    vector<string> generateParenthesis(int n) {
+        vector<string> ans;
+        solve(ans, 0, 0, n, "");
+        return ans;
+    }
+};
+```
+### 32. Longest Valid Parentheses
+Given a string containing just the characters '(' and ')', return the length of the longest valid (well-formed) parentheses 
+substring.
+* Input: s = ")()())"
+* Output: 4
+* Explanation: The longest valid parentheses substring is "()()".
+```
+class Solution{
+public:
+    int longestValidParentheses(string s) {
+        int maxans = 0;
+        vector<int> dp(s.length(), 0);
+        for (int i = 1; i < s.length(); i++) {
+            if (s[i] == ')') {
+                if (s[i - 1] == '(') {
+                    dp[i] = (i >= 2 ? dp[i - 2] : 0) + 2;
+                }
+                else if (i - dp[i - 1] > 0 && s[i - dp[i - 1] - 1] == '(') {
+                    dp[i] = dp[i - 1] + ((i - dp[i - 1]) >= 2 ? dp[i - dp[i - 1] - 2] : 0) + 2;
+                }
+                maxans = max(maxans, dp[i]);
+            }
+        }
+        return maxans;
     }
 };
 ```
